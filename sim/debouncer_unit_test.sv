@@ -62,7 +62,7 @@ module debouncer_unit_test;
 
     `UNIT_TEST(RESET_DEASSERTION)
 
-        `INFO("Start test RESET_DEASSERTION");
+        `INFO("Start RESET_DEASSERTION test");
 
         #10;
         `FAIL_IF_NOT_EQUAL(button_debounced, 1'b0);
@@ -74,7 +74,7 @@ module debouncer_unit_test;
 
     `UNIT_TEST(SIMPLE_BUTTON_PRESSURE)
 
-        `INFO("Start test SIMPLE_BUTTON_PRESSURE");
+        `INFO("Start SIMPLE_BUTTON_PRESSURE test");
 
         #100;
 
@@ -90,7 +90,7 @@ module debouncer_unit_test;
 
     `UNIT_TEST(SIMPLE_BUTTON_PRESSURE_THEN_RELEASE)
 
-        `INFO("Start test SIMPLE_BUTTON_PRESSURE_THEN_RELEASE");
+        `INFO("Start SIMPLE_BUTTON_PRESSURE_THEN_RELEASE");
 
         #100;
 
