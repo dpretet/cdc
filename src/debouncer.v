@@ -54,7 +54,8 @@ module debouncer
     end
 
     // Now detect button polarity change with a simple XNOR gate
-    // button_xnored will be active when the button polarity doesn't value
+    // button_xnored will be active when the button polarity doesn't
+    // change along two clock cycles
     always @ (posedge aclk or negedge arstn) begin
         if (arstn == 1'b0)
             ffd <= 1'b0;
@@ -83,6 +84,8 @@ module debouncer
                     timer <= timer + 1'b1;
 
                 // Now can properly assert the button into the system
+                // once the counter reachs the deboune time specified
+                // by the top level parameter
                 if (timer >= DEB_TIME)
                     button_debounced <= button_2ffd[1];
 
