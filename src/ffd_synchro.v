@@ -22,8 +22,8 @@ module ffd_synchro
     (
     input wire  aclk,
     input wire  arstn,
-    input wire  data_i,
-    output wire data_o
+    input wire  tvalid_i,
+    output wire tvalid_o
     );
 
     reg [1:0] synchro;
@@ -34,11 +34,11 @@ module ffd_synchro
             synchro <= 2'b0;
         end
         else begin
-            synchro <= {synchro[0], data_i};
+            synchro <= {synchro[0], tvalid_i};
         end
     end
 
-    assign data_o = synchro[1];
+    assign tvalid_o = synchro[1];
 
 
 endmodule

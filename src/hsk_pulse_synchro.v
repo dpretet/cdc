@@ -18,25 +18,30 @@
 `default_nettype none
 
 /*
-    Synchronize pulse signal from a fast domain to a slow clock domain.
-    It can handle only pulse at low frequency, meaning it absorbs and
-    transfers pulses only according destination domain capability.
+    This module synchronizes a pulse to a destination domain,
+    as well for high to low or low to high freq. It provides
+    back a ready signal to avoid losing a pulse.
 */
 
-module pulse_synchro
+module hsk_pulse_synchro
 
     (
-    input wire  aclk_i,
-    input wire  arstn_i,
-    input wire  aclk_o,
-    input wire  arstn_o,
-    input wire  tvalid_i,
+    input  wire aclk_i,
+    input  wire arstn_i,
+    input  wire aclk_o,
+    input  wire arstn_o,
+    input  wire tvalid_i,
+    output wire tready_i,
     output reg  tvalid_o
     );
 
-    reg pulse_mux;
+    reg  pulse_mux;
     wire pulse_mux_sync;
+    wire pulse_back;
+    wire pulse_passed_in_dest;
+    reg  pulse_mux_sync_ffd;
 
+    // First stage catching the pulse
     always @ (posedge aclk_i or negedge arstn_i) begin
 
         if (arstn_i == 1'b0) begin
@@ -44,31 +49,40 @@ module pulse_synchro
         end
         else begin
             if (tvalid_i == 1'b1)
-                pulse_mux <= ~pulse_mux;
-            else
-                pulse_mux <= pulse_mux;
+                pulse_mux <= 1'b1;
+            else begin
+                if (pulse_back == 1'b1)
+                    pulse_mux <= 1'b0;
+                else
+                    pulse_mux <= pulse_mux;
+            end
         end
     end
+
+    assign tready_i = ~(pulse_back | pulse_mux);
 
     // Resynchronize the pulse into destination domain
     ffd_synchro pulse_resync(aclk_o, arstn_o, pulse_mux, pulse_mux_sync);
 
+    // Resynchronize the pulse back into source domain
+    ffd_synchro pulse_bck2src(aclk_i, arstn_i, pulse_mux_sync, pulse_back);
+
     // Recreate a new pulse matching the destination domain speed
+    assign pulse_passed_in_dest = pulse_mux_sync & ~pulse_mux_sync_ffd;
+
+    // And synchronize finally the pulse into the destination
     always @ (posedge aclk_o or negedge arstn_o) begin: destination
 
-        reg ffd;
-
         if (arstn_o == 1'b0) begin
-            ffd <= 1'b0;
+            pulse_mux_sync_ffd <= 1'b0;
             tvalid_o <= 1'b0;
         end
         else begin
-            ffd <= pulse_mux_sync;
-            tvalid_o <= pulse_mux_sync ^ ffd;
+            pulse_mux_sync_ffd <= pulse_mux_sync;
+            tvalid_o <= pulse_passed_in_dest;
         end
 
     end
-
 
 endmodule
 

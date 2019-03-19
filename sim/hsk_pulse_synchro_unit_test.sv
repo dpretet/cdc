@@ -6,7 +6,7 @@
 
 `timescale 1 ns / 1 ps
 
-module pulse_synchro_unit_test;
+module hsk_pulse_synchro_unit_test;
 
     `SVUT_SETUP
 
@@ -15,9 +15,10 @@ module pulse_synchro_unit_test;
     reg   aclk_o;
     reg   arstn_o;
     reg   tvalid_i;
+    reg   tready_i;
     reg   tvalid_o;
 
-    pulse_synchro
+    hsk_pulse_synchro
     dut
     (
     aclk_i,
@@ -25,6 +26,7 @@ module pulse_synchro_unit_test;
     aclk_o,
     arstn_o,
     tvalid_i,
+    tready_i,
     tvalid_o
     );
 
@@ -38,7 +40,7 @@ module pulse_synchro_unit_test;
     always #ACLK_O_PERIOD aclk_o <= ~aclk_o;
 
     // An example to dump data for visualization
-    initial $dumpvars(0, pulse_synchro_unit_test);
+    initial $dumpvars(0, hsk_pulse_synchro_unit_test);
 
     task setup();
     begin
@@ -96,6 +98,9 @@ module pulse_synchro_unit_test;
                 tvalid_i = 1'b1;
                 @(posedge aclk_i);
                 tvalid_i = 1'b0;
+                `FAIL_IF(tready_i);
+                `FAIL_IF_NOT(tready_i);
+                `SUCCESS("TREADY signal is correctly asserted after pulse generation");
             end
             begin
                 `INFO("Waiting for the resynchronized pulse");

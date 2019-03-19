@@ -10,18 +10,18 @@ module ffd_synchro_unit_test;
 
     `SVUT_SETUP
 
-    reg   aclk;
-    reg   arstn;
-    reg   data_i;
-    wire data_o;
+    reg  aclk;
+    reg  arstn;
+    reg  tvalid_i;
+    wire tvalid_o;
 
     ffd_synchro
     dut
     (
     aclk,
     arstn,
-    data_i,
-    data_o
+    tvalid_i,
+    tvalid_o
     );
 
     // An example to create a clock
@@ -29,12 +29,12 @@ module ffd_synchro_unit_test;
     always #2 aclk <= ~aclk;
 
     // An example to dump data for visualization
-    initial $dumpvars(0,ffd_synchro_unit_test);
+    initial $dumpvars(0, ffd_synchro_unit_test);
 
     task setup();
     begin
         // setup() runs when a test begins
-        data_i = 1'b0;
+        tvalid_i = 1'b0;
         arstn = 1'b0;
     end
     endtask
@@ -66,27 +66,27 @@ module ffd_synchro_unit_test;
         `INFO("Deassert reset");
         #100;
 
-        `FAIL_IF(data_o);
+        `FAIL_IF(tvalid_o);
 
         `INFO("End test");
 
     `UNIT_TEST_END
 
-    `UNIT_TEST(DATA_IN_ASSERTION)
+    `UNIT_TEST(TVALID_IN_ASSERTION)
 
-        `INFO("Start DATA_IN_ASSERTION test");
+        `INFO("Start TVALID_IN_ASSERTION test");
 
         #100;
         arstn = 1'b1;
         `INFO("Deassert reset");
         #100;
 
-        `FAIL_IF(data_o);
+        `FAIL_IF(tvalid_o);
 
-        data_i = 1'b1;
+        tvalid_i = 1'b1;
         #20;
 
-        `FAIL_IF_NOT(data_o);
+        `FAIL_IF_NOT(tvalid_o);
 
         `INFO("End test");
 

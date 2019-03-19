@@ -29,7 +29,7 @@ module debouncer_unit_test;
     always #2 aclk <= ~aclk;
 
     // An example to dump data for visualization
-    initial $dumpvars(0,debouncer_unit_test);
+    initial $dumpvars(0, debouncer_unit_test);
 
     task setup();
     begin
