@@ -99,7 +99,6 @@ module hsk_pulse_synchro_unit_test;
                 @(posedge aclk_i);
                 tvalid_i = 1'b0;
                 `FAIL_IF(tready_i);
-                `FAIL_IF_NOT(tready_i);
                 `SUCCESS("TREADY signal is correctly asserted after pulse generation");
             end
             begin
