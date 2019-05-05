@@ -28,6 +28,8 @@ module pulse_synchro_unit_test;
     tvalid_o
     );
 
+    integer i;
+
     localparam ACLK_I_PERIOD = 2;
     localparam ACLK_O_PERIOD = 20;
 
@@ -109,6 +111,42 @@ module pulse_synchro_unit_test;
             end
 
         join
+
+        `INFO("Test finished");
+
+    `UNIT_TEST_END
+
+    `UNIT_TEST(TWO_PULSES)
+
+        `INFO("Start TWO_PULSES test");
+
+        for (i=0; i<2; i++) begin
+
+            fork
+
+                integer time_start, time_end, pulse_width;
+
+                begin
+                    `INFO("Generate the pulse");
+                    @(posedge aclk_i);
+                    tvalid_i = 1'b1;
+                    @(posedge aclk_i);
+                    tvalid_i = 1'b0;
+                end
+                begin
+                    `INFO("Waiting for the resynchronized pulse");
+                    @(posedge tvalid_o);
+                    time_start = $time;
+                    @(negedge tvalid_o);
+                    time_end = $time;
+                    pulse_width = time_end-time_start;
+                    `FAIL_IF_NOT_EQUAL(pulse_width, ACLK_O_PERIOD*2);
+                    `SUCCESS("Pulse received with correct width!");
+                end
+
+            join
+
+        end
 
         `INFO("Test finished");
 
